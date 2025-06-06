@@ -1,0 +1,16 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "🚀 Launch DeepSeek Chat",
+            "type": "shell",
+            "command": "${workspaceFolder}/deepseek-launcher.sh",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        }
+    ]
+}
