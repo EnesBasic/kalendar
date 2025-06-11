@@ -1,0 +1,168 @@
+"use client";
+import React from "react";
+
+function MainComponent({
+  selectedWeek = {
+    weekNumber: 1,
+    dateRange: "1-5 Jan 2025",
+    year: 2025,
+    shortDateRange: "01-05",
+    month: 1,
+  },
+  availableWeeks = [],
+  onBackClick = () => {},
+  onWeekChange = () => {},
+  onFilterClick = () => {},
+  onSearchClick = () => {},
+  onEditClick = () => {},
+}) {
+  const [localSelectedWeek, setLocalSelectedWeek] =
+    React.useState(selectedWeek);
+
+  React.useEffect(() => {
+    setLocalSelectedWeek(selectedWeek);
+  }, [selectedWeek]);
+
+  const handleLocalWeekChange = (week) => {
+    setLocalSelectedWeek(week);
+    onWeekChange(week);
+  };
+
+  return (
+    <BbHeader1
+      selectedWeek={localSelectedWeek}
+      availableWeeks={availableWeeks}
+      onBackClick={onBackClick}
+      onWeekChange={handleLocalWeekChange}
+      onFilterClick={onFilterClick}
+      onSearchClick={onSearchClick}
+      onEditClick={onEditClick}
+    />
+  );
+}
+
+function StoryComponent() {
+  const [selectedWeek, setSelectedWeek] = React.useState({
+    weekNumber: 1,
+    dateRange: "1-5 Jan 2025",
+    year: 2025,
+    shortDateRange: "01-05",
+    month: 1,
+  });
+
+  const availableWeeks = [
+    {
+      weekNumber: 1,
+      dateRange: "1-5 Jan 2025",
+      year: 2025,
+      shortDateRange: "01-05",
+      month: 1,
+    },
+    {
+      weekNumber: 2,
+      dateRange: "6-12 Jan 2025",
+      year: 2025,
+      shortDateRange: "06-12",
+      month: 1,
+    },
+    {
+      weekNumber: 3,
+      dateRange: "13-19 Jan 2025",
+      year: 2025,
+      shortDateRange: "13-19",
+      month: 1,
+    },
+    {
+      weekNumber: 4,
+      dateRange: "20-26 Jan 2025",
+      year: 2025,
+      shortDateRange: "20-26",
+      month: 1,
+    },
+    {
+      weekNumber: 5,
+      dateRange: "27 Jan - 2 Feb 2025",
+      year: 2025,
+      shortDateRange: "27-02",
+      month: "1-2",
+    },
+    {
+      weekNumber: 6,
+      dateRange: "3-9 Feb 2025",
+      year: 2025,
+      shortDateRange: "03-09",
+      month: 2,
+    },
+  ];
+
+  const handleWeekChange = (week) => {
+    console.log("Week changed in StoryComponent:", week);
+    setSelectedWeek(week);
+  };
+
+  return (
+    <div className="p-6 bg-[#121214] min-h-screen">
+      <h2 className="text-xl font-bold text-white mb-6">BBHeader</h2>
+
+      <div className="mb-8">
+        <h3 className="text-lg font-semibold text-white mb-4">Default State</h3>
+        <MainComponent
+          selectedWeek={selectedWeek}
+          availableWeeks={availableWeeks}
+          onBackClick={() => console.log("Back clicked")}
+          onWeekChange={handleWeekChange}
+          onFilterClick={() => console.log("Filter clicked")}
+          onSearchClick={() => console.log("Search clicked")}
+          onEditClick={() => console.log("Edit clicked")}
+        />
+      </div>
+
+      <div className="mb-8">
+        <h3 className="text-lg font-semibold text-white mb-4">
+          With Few Weeks
+        </h3>
+        <MainComponent
+          selectedWeek={selectedWeek}
+          availableWeeks={availableWeeks.slice(0, 2)}
+          onBackClick={() => console.log("Back clicked")}
+          onWeekChange={handleWeekChange}
+          onFilterClick={() => console.log("Filter clicked")}
+          onSearchClick={() => console.log("Search clicked")}
+          onEditClick={() => console.log("Edit clicked")}
+        />
+      </div>
+
+      <div className="mb-8">
+        <h3 className="text-lg font-semibold text-white mb-4">
+          No Available Weeks
+        </h3>
+        <MainComponent
+          selectedWeek={selectedWeek}
+          availableWeeks={[]}
+          onBackClick={() => console.log("Back clicked")}
+          onWeekChange={handleWeekChange}
+          onFilterClick={() => console.log("Filter clicked")}
+          onSearchClick={() => console.log("Search clicked")}
+          onEditClick={() => console.log("Edit clicked")}
+        />
+      </div>
+
+      <div className="mb-8">
+        <h3 className="text-lg font-semibold text-white mb-4">
+          Different Week Selected
+        </h3>
+        <MainComponent
+          selectedWeek={availableWeeks[3]}
+          availableWeeks={availableWeeks}
+          onBackClick={() => console.log("Back clicked")}
+          onWeekChange={handleWeekChange}
+          onFilterClick={() => console.log("Filter clicked")}
+          onSearchClick={() => console.log("Search clicked")}
+          onEditClick={() => console.log("Edit clicked")}
+        />
+      </div>
+    </div>
+  );
+}
+
+export default MainComponent;
