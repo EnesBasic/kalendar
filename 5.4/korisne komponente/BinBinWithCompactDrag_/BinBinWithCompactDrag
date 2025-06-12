@@ -1,0 +1,513 @@
+"use client";
+import React from "react";
+
+function MainComponent({ initialData = [], initialOperators = [] }) {
+  const [data, setData] = React.useState(initialData);
+  const [operators, setOperators] = React.useState(initialOperators);
+  const [selectedCell, setSelectedCell] = React.useState(null);
+  const [isDragging, setIsDragging] = React.useState(false);
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [showConfirmClear, setShowConfirmClear] = React.useState(false);
+  const [showSaveSuccess, setShowSaveSuccess] = React.useState(false);
+
+  const filteredData = React.useMemo(() => {
+    if (!searchTerm.trim()) return data;
+    return data.filter((item) => {
+      const dateMatch = item.date
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const dayMatch = item.day
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const shiftsMatch = item.shifts.some((shift) => {
+        const timeMatch = shift.time
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+        const operatorsMatch = Object.values(shift.operators).some(
+          (operator) =>
+            operator &&
+            operator.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        return timeMatch || operatorsMatch;
+      });
+      return dateMatch || dayMatch || shiftsMatch;
+    });
+  }, [data, searchTerm]);
+
+  const handleDragStart = (e, operator) => {
+    setIsDragging(true);
+    e.dataTransfer.setData("text/plain", operator);
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (e, dateIndex, shiftIndex, machine) => {
+    e.preventDefault();
+    const operator = e.dataTransfer.getData("text/plain");
+
+    const newData = [...data];
+    newData[dateIndex].shifts[shiftIndex].operators[machine] = operator;
+    setData(newData);
+    setIsDragging(false);
+  };
+
+  const handleCellClick = (dateIndex, shiftIndex, machine) => {
+    setSelectedCell({ dateIndex, shiftIndex, machine });
+  };
+
+  const handleOperatorAssign = (operator) => {
+    if (selectedCell) {
+      const { dateIndex, shiftIndex, machine } = selectedCell;
+      const newData = [...data];
+      newData[dateIndex].shifts[shiftIndex].operators[machine] = operator;
+      setData(newData);
+      setSelectedCell(null);
+    }
+  };
+
+  const handleClearCell = (dateIndex, shiftIndex, machine) => {
+    const newData = [...data];
+    newData[dateIndex].shifts[shiftIndex].operators[machine] = "";
+    setData(newData);
+  };
+
+  const handleClearAll = () => {
+    setShowConfirmClear(true);
+  };
+
+  const confirmClearAll = () => {
+    const newData = data.map((day) => ({
+      ...day,
+      shifts: day.shifts.map((shift) => ({
+        ...shift,
+        operators: Object.keys(shift.operators).reduce((acc, key) => {
+          acc[key] = "";
+          return acc;
+        }, {}),
+      })),
+    }));
+    setData(newData);
+    setShowConfirmClear(false);
+  };
+
+  const handleSave = () => {
+    console.log("Saving data:", data);
+    setShowSaveSuccess(true);
+    setTimeout(() => setShowSaveSuccess(false), 3000);
+  };
+
+  const getMachines = () => {
+    if (data.length === 0 || data[0].shifts.length === 0) return [];
+    return Object.keys(data[0].shifts[0].operators);
+  };
+
+  return (
+    <div className="bg-[#121214] text-white p-4 rounded-lg shadow-lg w-full max-w-[1200px] mx-auto">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold text-[#67e8f9]">Schedule Manager</h2>
+        <div className="flex space-x-2">
+          <button
+            onClick={handleClearAll}
+            className="bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white px-3 py-1 rounded text-sm"
+          >
+            Clear All
+          </button>
+          <button
+            onClick={handleSave}
+            className="bg-[#67e8f9] hover:bg-[#a5f3ff] text-[#121214] px-3 py-1 rounded text-sm font-medium"
+          >
+            Save Schedule
+          </button>
+        </div>
+      </div>
+
+      <div className="relative mb-4">
+        <input
+          type="text"
+          placeholder="Search schedule..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full bg-[#2A2A2A] text-white rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#67e8f9]"
+        />
+        {searchTerm && (
+          <button
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+            onClick={() => setSearchTerm("")}
+          >
+            <i className="fas fa-times"></i>
+          </button>
+        )}
+      </div>
+
+      <div className="overflow-x-auto mb-4">
+        <table className="min-w-full border-collapse">
+          <thead>
+            <tr className="bg-[#1D1D1F]">
+              <th className="px-3 py-2 text-left text-sm font-medium text-[#67e8f9] border-b border-[#2A2A2A]">
+                Date
+              </th>
+              <th className="px-3 py-2 text-left text-sm font-medium text-[#67e8f9] border-b border-[#2A2A2A]">
+                Day
+              </th>
+              <th className="px-3 py-2 text-left text-sm font-medium text-[#67e8f9] border-b border-[#2A2A2A]">
+                Shift
+              </th>
+              {getMachines().map((machine) => (
+                <th
+                  key={machine}
+                  className="px-3 py-2 text-left text-sm font-medium text-[#67e8f9] border-b border-[#2A2A2A]"
+                >
+                  {machine}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filteredData.map((day, dateIndex) =>
+              day.shifts.map((shift, shiftIndex) => (
+                <tr
+                  key={`${dateIndex}-${shiftIndex}`}
+                  className={`${
+                    dateIndex % 2 === 0 ? "bg-[#1A1A1A]" : "bg-[#1D1D1F]"
+                  } hover:bg-[#2A2A2A]`}
+                >
+                  {shiftIndex === 0 && (
+                    <td
+                      rowSpan={day.shifts.length}
+                      className="px-3 py-2 text-sm border-b border-[#2A2A2A] align-middle"
+                    >
+                      {day.date}
+                    </td>
+                  )}
+                  {shiftIndex === 0 && (
+                    <td
+                      rowSpan={day.shifts.length}
+                      className="px-3 py-2 text-sm border-b border-[#2A2A2A] align-middle"
+                    >
+                      {day.day}
+                    </td>
+                  )}
+                  <td className="px-3 py-2 text-sm border-b border-[#2A2A2A]">
+                    {shift.time}
+                  </td>
+                  {Object.entries(shift.operators).map(
+                    ([machine, operator]) => (
+                      <td
+                        key={machine}
+                        className="px-3 py-2 text-sm border-b border-[#2A2A2A]"
+                        onClick={() =>
+                          handleCellClick(dateIndex, shiftIndex, machine)
+                        }
+                        onDragOver={handleDragOver}
+                        onDrop={(e) =>
+                          handleDrop(e, dateIndex, shiftIndex, machine)
+                        }
+                      >
+                        <div
+                          className={`
+                          min-h-[30px] rounded p-1 
+                          ${
+                            operator
+                              ? "bg-[#2A2A2A]"
+                              : "bg-[#1D1D1F] border border-dashed border-[#3A3A3A]"
+                          }
+                          ${
+                            selectedCell &&
+                            selectedCell.dateIndex === dateIndex &&
+                            selectedCell.shiftIndex === shiftIndex &&
+                            selectedCell.machine === machine
+                              ? "ring-2 ring-[#67e8f9]"
+                              : ""
+                          }
+                          ${isDragging && !operator ? "bg-[#2A2A2A]/50" : ""}
+                          cursor-pointer
+                        `}
+                        >
+                          {operator ? (
+                            <div className="flex justify-between items-center">
+                              <span>{operator}</span>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleClearCell(
+                                    dateIndex,
+                                    shiftIndex,
+                                    machine
+                                  );
+                                }}
+                                className="text-gray-400 hover:text-white text-xs"
+                              >
+                                <i className="fas fa-times"></i>
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="text-gray-500 text-xs text-center">
+                              Drop operator here
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    )
+                  )}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mt-4">
+        <div className="operator-drag-container fixed bottom-0 left-0 right-0 bg-[#1D1D1F] border-t border-[#2A2A2A] p-3 shadow-lg z-40">
+          <div className="flex justify-between items-center mb-2">
+            <h4 className="text-white text-xs font-medium">
+              Povuci Operatore na Raspored:
+            </h4>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-400 text-xs">
+                {operators.length} operatora
+              </span>
+            </div>
+          </div>
+          <div
+            className="operator-list-container flex flex-wrap gap-1 pb-1 relative"
+            style={{
+              height: "80px",
+              overflowY: "auto",
+              overflowX: "hidden",
+              paddingRight: "12px",
+              marginRight: "0px",
+              scrollbarWidth: "thin",
+              scrollbarColor: "#67e8f9 #1D1D1F",
+              scrollbarGutter: "stable",
+            }}
+          >
+            {operators.map((operator, index) => (
+              <div
+                key={index}
+                draggable
+                onDragStart={(e) => handleDragStart(e, operator)}
+                onDragEnd={handleDragEnd}
+                className="px-1.5 py-0.5 rounded text-[10px] cursor-move transition-transform hover:scale-105 active:scale-95 mb-1 touch-manipulation"
+                style={{
+                  backgroundColor: "#3A3A3A",
+                  color: "white",
+                  userSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  msUserSelect: "none",
+                  touchAction: "manipulation",
+                  fontSize: "10px",
+                  lineHeight: "1",
+                  margin: "1px",
+                  display: "inline-block",
+                  width: "fit-content",
+                  height: "16px",
+                }}
+              >
+                {operator}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {selectedCell && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-[#1D1D1F] rounded-lg p-4 w-[320px] max-w-[90vw]">
+            <h3 className="text-white text-lg font-semibold mb-4">
+              Assign Operator
+            </h3>
+            <div className="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto">
+              {operators.map((operator, index) => (
+                <button
+                  key={index}
+                  className="bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white py-2 px-3 rounded text-sm text-left"
+                  onClick={() => handleOperatorAssign(operator)}
+                >
+                  {operator}
+                </button>
+              ))}
+            </div>
+            <div className="mt-4 flex justify-end">
+              <button
+                className="bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white px-3 py-1 rounded text-sm mr-2"
+                onClick={() => setSelectedCell(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-[#67e8f9] hover:bg-[#a5f3ff] text-[#121214] px-3 py-1 rounded text-sm font-medium"
+                onClick={() => handleOperatorAssign("")}
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showConfirmClear && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-[#1D1D1F] rounded-lg p-4 w-[320px] max-w-[90vw]">
+            <h3 className="text-white text-lg font-semibold mb-4">
+              Confirm Clear All
+            </h3>
+            <p className="text-gray-300 mb-4">
+              Are you sure you want to clear all operator assignments? This
+              action cannot be undone.
+            </p>
+            <div className="flex justify-end">
+              <button
+                className="bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white px-3 py-1 rounded text-sm mr-2"
+                onClick={() => setShowConfirmClear(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-medium"
+                onClick={confirmClearAll}
+              >
+                Clear All
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSaveSuccess && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50 animate-fade-in">
+          Schedule saved successfully!
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StoryComponent() {
+  const mockOperators = [
+    "John Doe",
+    "Jane Smith",
+    "Mark Johnson",
+    "Emily Wilson",
+    "Michael Brown",
+    "Sarah Davis",
+    "Robert Miller",
+    "Jennifer Garcia",
+    "William Martinez",
+    "Elizabeth Anderson",
+    "David Thompson",
+    "Lisa Rodriguez",
+    "James White",
+    "Patricia Lewis",
+    "Thomas Walker",
+  ];
+
+  const mockData = [
+    {
+      date: "01.01",
+      day: "P",
+      shifts: [
+        {
+          time: "08.00-16.00",
+          operators: {
+            "M58-J-467": "John Doe",
+            "M53-E-929": "Jane Smith",
+            "A35-J-924": "",
+          },
+        },
+        {
+          time: "20.00-04.00",
+          operators: {
+            "M58-J-467": "",
+            "M53-E-929": "Mark Johnson",
+            "A35-J-924": "",
+          },
+        },
+      ],
+    },
+    {
+      date: "02.01",
+      day: "U",
+      shifts: [
+        {
+          time: "08.00-16.00",
+          operators: {
+            "M58-J-467": "Jane Smith",
+            "M53-E-929": "",
+            "A35-J-924": "John Doe",
+          },
+        },
+        {
+          time: "20.00-04.00",
+          operators: {
+            "M58-J-467": "Mark Johnson",
+            "M53-E-929": "",
+            "A35-J-924": "",
+          },
+        },
+      ],
+    },
+    {
+      date: "03.01",
+      day: "S",
+      shifts: [
+        {
+          time: "08.00-16.00",
+          operators: {
+            "M58-J-467": "Emily Wilson",
+            "M53-E-929": "Michael Brown",
+            "A35-J-924": "",
+          },
+        },
+        {
+          time: "20.00-04.00",
+          operators: {
+            "M58-J-467": "",
+            "M53-E-929": "Sarah Davis",
+            "A35-J-924": "Robert Miller",
+          },
+        },
+      ],
+    },
+    {
+      date: "04.01",
+      day: "Č",
+      shifts: [
+        {
+          time: "08.00-16.00",
+          operators: {
+            "M58-J-467": "",
+            "M53-E-929": "Jennifer Garcia",
+            "A35-J-924": "",
+          },
+        },
+        {
+          time: "20.00-04.00",
+          operators: {
+            "M58-J-467": "William Martinez",
+            "M53-E-929": "",
+            "A35-J-924": "Elizabeth Anderson",
+          },
+        },
+      ],
+    },
+  ];
+
+  return (
+    <div className="p-4 bg-[#121214] min-h-screen">
+      <h2 className="text-white text-xl mb-4">
+        BinBin with Compact Operator Drag Section
+      </h2>
+      <MainComponent initialData={mockData} initialOperators={mockOperators} />
+    </div>
+  );
+}
+
+export default MainComponent;
