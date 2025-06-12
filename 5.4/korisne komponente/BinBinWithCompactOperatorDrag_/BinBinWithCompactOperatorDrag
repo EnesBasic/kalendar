@@ -1,0 +1,719 @@
+"use client";
+import React from "react";
+
+function MainComponent({ initialData = [], initialOperators = [], onSave }) {
+  const [data, setData] = React.useState(initialData);
+  const [operators, setOperators] = React.useState(initialOperators);
+  const [editMode, setEditMode] = React.useState(false);
+  const [isDragging, setIsDragging] = React.useState(false);
+  const [draggedOperator, setDraggedOperator] = React.useState(null);
+  const [showConfirmation, setShowConfirmation] = React.useState(false);
+  const [selectedCell, setSelectedCell] = React.useState(null);
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [editValue, setEditValue] = React.useState("");
+  const [editingCell, setEditingCell] = React.useState(null);
+  const [showAddOperatorModal, setShowAddOperatorModal] = React.useState(false);
+  const [newOperatorName, setNewOperatorName] = React.useState("");
+  const [newOperatorColor, setNewOperatorColor] = React.useState("#4a9eff");
+  const [showColorPicker, setShowColorPicker] = React.useState(false);
+  const [colorPickerTarget, setColorPickerTarget] = React.useState(null);
+
+  const [operatorColors, setOperatorColors] = React.useState({});
+
+  const availableColors = [
+    "#4a9eff", // blue
+    "#10b981", // green
+    "#8b5cf6", // purple
+    "#f43f5e", // red
+    "#fbbf24", // yellow
+    "#06b6d4", // cyan
+    "#ec4899", // pink
+    "#f97316", // orange
+    "#14b8a6", // teal
+    "#6366f1", // indigo
+  ];
+
+  React.useEffect(() => {
+    setData(initialData);
+  }, [initialData]);
+
+  React.useEffect(() => {
+    setOperators(initialOperators);
+
+    const colors = {};
+    initialOperators.forEach((operator, index) => {
+      colors[operator] = availableColors[index % availableColors.length];
+    });
+    setOperatorColors(colors);
+  }, [initialOperators]);
+
+  const handleDragStart = (e, operator) => {
+    setIsDragging(true);
+    setDraggedOperator(operator);
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+    setDraggedOperator(null);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (e, dayIndex, shiftIndex, machineKey) => {
+    e.preventDefault();
+    if (!draggedOperator) return;
+
+    const newData = [...data];
+    const day = newData[dayIndex];
+    const shift = day.shifts[shiftIndex];
+
+    shift.operators[machineKey] = draggedOperator;
+
+    setData(newData);
+    setIsDragging(false);
+    setDraggedOperator(null);
+  };
+
+  const handleCellClick = (dayIndex, shiftIndex, machineKey, currentValue) => {
+    if (editMode) {
+      setSelectedCell({ dayIndex, shiftIndex, machineKey });
+      setEditValue(currentValue);
+      setEditingCell({ dayIndex, shiftIndex, machineKey });
+      setIsEditing(true);
+    }
+  };
+
+  const handleCellDoubleClick = (
+    dayIndex,
+    shiftIndex,
+    machineKey,
+    currentValue
+  ) => {
+    setSelectedCell({ dayIndex, shiftIndex, machineKey });
+    setEditValue(currentValue);
+    setEditingCell({ dayIndex, shiftIndex, machineKey });
+    setIsEditing(true);
+  };
+
+  const handleCellChange = (e) => {
+    setEditValue(e.target.value);
+  };
+
+  const handleCellBlur = () => {
+    if (isEditing && editingCell) {
+      const { dayIndex, shiftIndex, machineKey } = editingCell;
+      const newData = [...data];
+      newData[dayIndex].shifts[shiftIndex].operators[machineKey] = editValue;
+      setData(newData);
+      setIsEditing(false);
+      setEditingCell(null);
+    }
+  };
+
+  const handleCellKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleCellBlur();
+    } else if (e.key === "Escape") {
+      setIsEditing(false);
+      setEditingCell(null);
+    }
+  };
+
+  const handleSave = () => {
+    if (onSave) {
+      onSave(data);
+    }
+    setEditMode(false);
+    setShowConfirmation(true);
+    setTimeout(() => {
+      setShowConfirmation(false);
+    }, 3000);
+  };
+
+  const handleAddOperator = () => {
+    if (newOperatorName.trim() && !operators.includes(newOperatorName.trim())) {
+      const newOperator = newOperatorName.trim();
+      setOperators([...operators, newOperator]);
+
+      setOperatorColors((prev) => ({
+        ...prev,
+        [newOperator]: newOperatorColor,
+      }));
+
+      setNewOperatorName("");
+      setNewOperatorColor(
+        availableColors[Math.floor(Math.random() * availableColors.length)]
+      );
+      setShowAddOperatorModal(false);
+    }
+  };
+
+  const handleRemoveOperator = (operatorToRemove) => {
+    setOperators(operators.filter((operator) => operator !== operatorToRemove));
+
+    setOperatorColors((prev) => {
+      const newColors = { ...prev };
+      delete newColors[operatorToRemove];
+      return newColors;
+    });
+
+    const updatedData = data.map((day) => ({
+      ...day,
+      shifts: day.shifts.map((shift) => ({
+        ...shift,
+        operators: Object.fromEntries(
+          Object.entries(shift.operators).map(([machine, operator]) => [
+            machine,
+            operator === operatorToRemove ? "" : operator,
+          ])
+        ),
+      })),
+    }));
+
+    setData(updatedData);
+  };
+
+  const handleColorChange = (operator, color) => {
+    setOperatorColors((prev) => ({
+      ...prev,
+      [operator]: color,
+    }));
+  };
+
+  const handleClearCell = (dayIndex, shiftIndex, machineKey) => {
+    const newData = [...data];
+    newData[dayIndex].shifts[shiftIndex].operators[machineKey] = "";
+    setData(newData);
+  };
+
+  const getContrastTextColor = (bgColor) => {
+    const hex = bgColor.replace("#", "");
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+    return luminance > 0.5 ? "#000000" : "#FFFFFF";
+  };
+
+  return (
+    <div className="bg-[#121214] text-white p-4 rounded-lg shadow-lg w-full">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold text-[#67e8f9]">Schedule Manager</h2>
+        <div className="flex space-x-2">
+          <button
+            onClick={() => setEditMode(!editMode)}
+            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+              editMode
+                ? "bg-[#67e8f9] text-[#121214]"
+                : "bg-[#2A2A2A] text-white hover:bg-[#3A3A3A]"
+            }`}
+          >
+            {editMode ? "Exit Edit Mode" : "Edit Mode"}
+          </button>
+          {editMode && (
+            <button
+              onClick={handleSave}
+              className="bg-[#10b981] hover:bg-[#0d9668] text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
+            >
+              Save Changes
+            </button>
+          )}
+        </div>
+      </div>
+
+      {showConfirmation && (
+        <div className="bg-[#10b981] text-white p-2 rounded-md mb-4 flex items-center justify-between animate-fade-in">
+          <span>Schedule saved successfully!</span>
+          <button
+            onClick={() => setShowConfirmation(false)}
+            className="text-white hover:text-gray-200"
+          >
+            <i className="fas fa-times"></i>
+          </button>
+        </div>
+      )}
+
+      <div className="overflow-x-auto">
+        <table className="min-w-full border-collapse">
+          <thead>
+            <tr>
+              <th className="border border-[#2A2A2A] p-2 bg-[#1D1D1F] text-left">
+                Date/Day
+              </th>
+              <th className="border border-[#2A2A2A] p-2 bg-[#1D1D1F] text-left">
+                Shift
+              </th>
+              {data.length > 0 &&
+                data[0].shifts.length > 0 &&
+                Object.keys(data[0].shifts[0].operators).map((machine) => (
+                  <th
+                    key={machine}
+                    className="border border-[#2A2A2A] p-2 bg-[#1D1D1F] text-left"
+                  >
+                    {machine}
+                  </th>
+                ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((day, dayIndex) => (
+              <React.Fragment key={dayIndex}>
+                {day.shifts.map((shift, shiftIndex) => (
+                  <tr
+                    key={`${dayIndex}-${shiftIndex}`}
+                    className={
+                      shiftIndex % 2 === 0 ? "bg-[#1A1A1A]" : "bg-[#222222]"
+                    }
+                  >
+                    {shiftIndex === 0 && (
+                      <td
+                        rowSpan={day.shifts.length}
+                        className="border border-[#2A2A2A] p-2 align-middle"
+                      >
+                        <div className="font-medium">{day.date}</div>
+                        <div className="text-sm text-gray-400">{day.day}</div>
+                      </td>
+                    )}
+                    <td className="border border-[#2A2A2A] p-2">
+                      {shift.time}
+                    </td>
+                    {Object.entries(shift.operators).map(
+                      ([machine, operator], index) => (
+                        <td
+                          key={`${dayIndex}-${shiftIndex}-${index}`}
+                          className={`border border-[#2A2A2A] p-1 relative ${
+                            selectedCell &&
+                            selectedCell.dayIndex === dayIndex &&
+                            selectedCell.shiftIndex === shiftIndex &&
+                            selectedCell.machineKey === machine
+                              ? "bg-[#2A2A2A]"
+                              : ""
+                          }`}
+                          onClick={() =>
+                            handleCellClick(
+                              dayIndex,
+                              shiftIndex,
+                              machine,
+                              operator
+                            )
+                          }
+                          onDoubleClick={() =>
+                            handleCellDoubleClick(
+                              dayIndex,
+                              shiftIndex,
+                              machine,
+                              operator
+                            )
+                          }
+                          onDragOver={handleDragOver}
+                          onDrop={(e) =>
+                            handleDrop(e, dayIndex, shiftIndex, machine)
+                          }
+                        >
+                          {isEditing &&
+                          editingCell &&
+                          editingCell.dayIndex === dayIndex &&
+                          editingCell.shiftIndex === shiftIndex &&
+                          editingCell.machineKey === machine ? (
+                            <input
+                              type="text"
+                              value={editValue}
+                              onChange={handleCellChange}
+                              onBlur={handleCellBlur}
+                              onKeyDown={handleCellKeyDown}
+                              className="w-full bg-[#2A2A2A] text-white p-1 focus:outline-none focus:ring-1 focus:ring-[#67e8f9]"
+                              autoFocus
+                            />
+                          ) : (
+                            <div className="flex items-center justify-between">
+                              {operator ? (
+                                <div
+                                  className="inline-flex items-center px-2 py-1 rounded-full text-xs"
+                                  style={{
+                                    backgroundColor: operatorColors[operator]
+                                      ? `${operatorColors[operator]}20`
+                                      : "#2A2A2A",
+                                    borderLeft: `3px solid ${
+                                      operatorColors[operator] || "#67e8f9"
+                                    }`,
+                                  }}
+                                >
+                                  <div
+                                    className="w-2 h-2 rounded-full mr-1.5 flex-shrink-0"
+                                    style={{
+                                      backgroundColor:
+                                        operatorColors[operator] || "#67e8f9",
+                                    }}
+                                  ></div>
+                                  <span>{operator}</span>
+                                  {editMode && (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleClearCell(
+                                          dayIndex,
+                                          shiftIndex,
+                                          machine
+                                        );
+                                      }}
+                                      className="ml-1 text-gray-400 hover:text-red-400"
+                                    >
+                                      <i className="fas fa-times text-xs"></i>
+                                    </button>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="h-6 flex items-center text-gray-500">
+                                  {editMode ? "Drop operator here" : "—"}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </td>
+                      )
+                    )}
+                  </tr>
+                ))}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {editMode && (
+        <>
+          <div className="fixed bottom-0 left-0 right-0 bg-[#1D1D1F] border-t border-[#2A2A2A] p-3 shadow-lg z-10">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-sm font-medium text-[#67e8f9]">Operators</h3>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setShowAddOperatorModal(true)}
+                  className="bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white px-2 py-1 rounded text-xs font-medium transition-colors flex items-center"
+                >
+                  <i className="fas fa-plus mr-1"></i>
+                  Add
+                </button>
+              </div>
+            </div>
+
+            <div
+              className="flex flex-wrap gap-2 max-h-20 overflow-y-auto p-1"
+              style={{
+                scrollbarWidth: "thin",
+                scrollbarColor: "#67e8f9 #1D1D1F",
+              }}
+            >
+              {operators.length > 0 ? (
+                operators.map((operator, index) => (
+                  <div
+                    key={index}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, operator)}
+                    onDragEnd={handleDragEnd}
+                    className="bg-[#2A2A2A] text-white text-xs rounded-full px-2 py-1 cursor-grab hover:bg-[#3A3A3A] active:cursor-grabbing flex items-center whitespace-nowrap group"
+                  >
+                    <div
+                      className="w-2.5 h-2.5 rounded-full mr-1.5 flex-shrink-0"
+                      style={{
+                        backgroundColor: operatorColors[operator] || "#67e8f9",
+                      }}
+                    ></div>
+                    <span className="mr-1">{operator}</span>
+                    <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setColorPickerTarget(operator);
+                          setShowColorPicker(true);
+                        }}
+                        className="text-gray-400 hover:text-[#67e8f9]"
+                        title="Change color"
+                      >
+                        <i className="fas fa-palette text-xs"></i>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveOperator(operator);
+                        }}
+                        className="text-gray-400 hover:text-red-400"
+                        title="Remove operator"
+                      >
+                        <i className="fas fa-times text-xs"></i>
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-gray-400 text-xs w-full text-center py-2">
+                  No operators added yet
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {showAddOperatorModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-[#1D1D1F] rounded-lg p-4 w-[300px] max-w-[90vw]">
+            <h3 className="text-white text-lg font-semibold mb-3">
+              Add New Operator
+            </h3>
+            <div className="mb-3">
+              <input
+                type="text"
+                value={newOperatorName}
+                onChange={(e) => setNewOperatorName(e.target.value)}
+                placeholder="Operator name"
+                className="w-full bg-[#2A2A2A] text-white p-2 rounded mb-2 focus:outline-none focus:ring-1 focus:ring-[#67e8f9]"
+                autoFocus
+              />
+
+              <div className="mt-2">
+                <label className="text-sm text-gray-300 mb-1 block">
+                  Select color:
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {availableColors.map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => setNewOperatorColor(color)}
+                      className={`w-6 h-6 rounded-full ${
+                        newOperatorColor === color ? "ring-2 ring-white" : ""
+                      }`}
+                      style={{ backgroundColor: color }}
+                    ></button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-2 flex items-center">
+                <span className="text-sm text-gray-300 mr-2">Preview:</span>
+                <div
+                  className="inline-flex items-center px-2 py-1 rounded-full text-xs"
+                  style={{
+                    backgroundColor: `${newOperatorColor}20`,
+                    borderLeft: `3px solid ${newOperatorColor}`,
+                  }}
+                >
+                  <div
+                    className="w-2.5 h-2.5 rounded-full mr-1.5 flex-shrink-0"
+                    style={{ backgroundColor: newOperatorColor }}
+                  ></div>
+                  <span
+                    style={{ color: getContrastTextColor(newOperatorColor) }}
+                  >
+                    {newOperatorName || "Operator Name"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setShowAddOperatorModal(false)}
+                className="bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddOperator}
+                className="bg-[#10b981] hover:bg-[#0d9668] text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
+                disabled={!newOperatorName.trim()}
+              >
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showColorPicker && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-[#1D1D1F] rounded-lg p-4 w-[300px] max-w-[90vw]">
+            <h3 className="text-white text-lg font-semibold mb-3">
+              Change Color for {colorPickerTarget}
+            </h3>
+
+            <div className="mb-3">
+              <div className="flex flex-wrap gap-2">
+                {availableColors.map((color) => (
+                  <button
+                    key={color}
+                    onClick={() => handleColorChange(colorPickerTarget, color)}
+                    className={`w-8 h-8 rounded-full ${
+                      operatorColors[colorPickerTarget] === color
+                        ? "ring-2 ring-white"
+                        : ""
+                    }`}
+                    style={{ backgroundColor: color }}
+                  ></button>
+                ))}
+              </div>
+
+              <div className="mt-3 flex items-center">
+                <span className="text-sm text-gray-300 mr-2">Preview:</span>
+                <div
+                  className="inline-flex items-center px-2 py-1 rounded-full text-xs"
+                  style={{
+                    backgroundColor: `${
+                      operatorColors[colorPickerTarget] || "#67e8f9"
+                    }20`,
+                    borderLeft: `3px solid ${
+                      operatorColors[colorPickerTarget] || "#67e8f9"
+                    }`,
+                  }}
+                >
+                  <div
+                    className="w-2.5 h-2.5 rounded-full mr-1.5 flex-shrink-0"
+                    style={{
+                      backgroundColor:
+                        operatorColors[colorPickerTarget] || "#67e8f9",
+                    }}
+                  ></div>
+                  <span>{colorPickerTarget}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowColorPicker(false)}
+                className="bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StoryComponent() {
+  const [mockData, setMockData] = React.useState([
+    {
+      date: "01.01",
+      day: "P",
+      shifts: [
+        {
+          time: "08.00-16.00",
+          operators: {
+            "M58-J-467": "John Doe",
+            "M53-E-929": "Jane Smith",
+            "A35-J-924": "",
+          },
+        },
+        {
+          time: "20.00-04.00",
+          operators: {
+            "M58-J-467": "",
+            "M53-E-929": "Mark Johnson",
+            "A35-J-924": "",
+          },
+        },
+      ],
+    },
+    {
+      date: "02.01",
+      day: "U",
+      shifts: [
+        {
+          time: "08.00-16.00",
+          operators: {
+            "M58-J-467": "Jane Smith",
+            "M53-E-929": "",
+            "A35-J-924": "John Doe",
+          },
+        },
+        {
+          time: "20.00-04.00",
+          operators: {
+            "M58-J-467": "Mark Johnson",
+            "M53-E-929": "",
+            "A35-J-924": "",
+          },
+        },
+      ],
+    },
+    {
+      date: "03.01",
+      day: "S",
+      shifts: [
+        {
+          time: "08.00-16.00",
+          operators: {
+            "M58-J-467": "Mark Johnson",
+            "M53-E-929": "John Doe",
+            "A35-J-924": "",
+          },
+        },
+        {
+          time: "20.00-04.00",
+          operators: {
+            "M58-J-467": "",
+            "M53-E-929": "Jane Smith",
+            "A35-J-924": "",
+          },
+        },
+      ],
+    },
+  ]);
+
+  const mockOperators = [
+    "John Doe",
+    "Jane Smith",
+    "Mark Johnson",
+    "Emily Wilson",
+    "Michael Brown",
+  ];
+
+  const handleSave = (data) => {
+    console.log("Saving data:", data);
+    setMockData(data);
+  };
+
+  return (
+    <div className="p-4 bg-[#121214] min-h-screen">
+      <h1 className="text-white text-2xl font-bold mb-6">
+        BinBin with Compact Operator Drag
+      </h1>
+
+      <div className="mb-8">
+        <h2 className="text-white text-xl mb-4">Default View</h2>
+        <MainComponent
+          initialData={mockData}
+          initialOperators={mockOperators}
+          onSave={handleSave}
+        />
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-white text-xl mb-4">Empty Schedule</h2>
+        <MainComponent
+          initialData={[]}
+          initialOperators={mockOperators}
+          onSave={handleSave}
+        />
+      </div>
+
+      <div>
+        <h2 className="text-white text-xl mb-4">No Operators</h2>
+        <MainComponent
+          initialData={mockData}
+          initialOperators={[]}
+          onSave={handleSave}
+        />
+      </div>
+    </div>
+  );
+}
+
+export default MainComponent;

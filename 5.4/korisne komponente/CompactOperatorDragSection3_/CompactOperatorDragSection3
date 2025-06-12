@@ -1,0 +1,191 @@
+"use client";
+import React from "react";
+
+function MainComponent({
+  operators = [],
+  onDragStart,
+  onRemoveOperator,
+  className = "",
+  title = "Operators",
+  maxHeight = "16rem",
+}) {
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [isExpanded, setIsExpanded] = React.useState(false);
+
+  const filteredOperators = React.useMemo(() => {
+    if (!searchTerm.trim()) return operators;
+    return operators.filter((operator) =>
+      operator.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [operators, searchTerm]);
+
+  const handleDragStart = (e, operator) => {
+    if (onDragStart) {
+      onDragStart(e, operator);
+    }
+    e.dataTransfer.setData("text/plain", operator);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleRemoveOperator = (operator) => {
+    if (onRemoveOperator) {
+      onRemoveOperator(operator);
+    }
+  };
+
+  return (
+    <div className={`bg-[#1D1D1F] rounded-lg p-2 ${className}`}>
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-white text-sm font-medium">{title}</h3>
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="text-[#67e8f9] hover:text-[#a5f3ff] text-xs"
+        >
+          {isExpanded ? "Collapse" : "Expand"}
+        </button>
+      </div>
+
+      <div className="relative mb-2">
+        <input
+          type="text"
+          placeholder="Search operators..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full bg-[#2A2A2A] text-white text-xs rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#67e8f9]"
+        />
+        {searchTerm && (
+          <button
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+            onClick={() => setSearchTerm("")}
+          >
+            <i className="fas fa-times text-xs"></i>
+          </button>
+        )}
+      </div>
+
+      <div
+        className={`flex flex-wrap gap-1 overflow-y-auto transition-all duration-300 ${
+          isExpanded ? `max-h-[${maxHeight}]` : "max-h-16"
+        }`}
+        style={{
+          scrollbarWidth: "thin",
+          scrollbarColor: "#67e8f9 #2A2A2A",
+          maxHeight: isExpanded ? maxHeight : "4rem",
+        }}
+      >
+        {filteredOperators.length > 0 ? (
+          filteredOperators.map((operator, index) => (
+            <div
+              key={index}
+              draggable
+              onDragStart={(e) => handleDragStart(e, operator)}
+              className="bg-[#2A2A2A] text-white text-xs rounded px-2 py-1 cursor-grab hover:bg-[#3A3A3A] active:cursor-grabbing flex items-center whitespace-nowrap group"
+            >
+              <i className="fas fa-user-circle mr-1 text-[#67e8f9]"></i>
+              {operator}
+              {onRemoveOperator && (
+                <button
+                  onClick={() => handleRemoveOperator(operator)}
+                  className="ml-1 text-gray-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <i className="fas fa-times text-xs"></i>
+                </button>
+              )}
+            </div>
+          ))
+        ) : (
+          <div className="text-gray-400 text-xs w-full text-center py-1">
+            No operators found
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function StoryComponent() {
+  const [operators, setOperators] = React.useState([
+    "John Doe",
+    "Jane Smith",
+    "Mark Johnson",
+    "Emily Wilson",
+    "Michael Brown",
+    "Sarah Davis",
+    "Robert Miller",
+    "Jennifer Garcia",
+    "William Martinez",
+    "Elizabeth Anderson",
+  ]);
+
+  const handleDragStart = (e, operator) => {
+    console.log(`Dragging operator: ${operator}`);
+  };
+
+  const handleRemoveOperator = (operator) => {
+    setOperators(operators.filter((op) => op !== operator));
+    console.log(`Removed operator: ${operator}`);
+  };
+
+  const handleAddOperator = () => {
+    const newOperator = `New Operator ${Math.floor(Math.random() * 100)}`;
+    setOperators([...operators, newOperator]);
+  };
+
+  return (
+    <div className="p-4 bg-[#121214] min-h-screen">
+      <h2 className="text-white text-xl mb-4">Compact Operator Drag Section</h2>
+
+      <div className="mb-8">
+        <h3 className="text-white text-lg mb-2">Default View</h3>
+        <MainComponent operators={operators} onDragStart={handleDragStart} />
+      </div>
+
+      <div className="mb-8">
+        <h3 className="text-white text-lg mb-2">With Removal Functionality</h3>
+        <MainComponent
+          operators={operators}
+          onDragStart={handleDragStart}
+          onRemoveOperator={handleRemoveOperator}
+        />
+        <button
+          onClick={handleAddOperator}
+          className="mt-2 bg-[#2A2A2A] text-[#67e8f9] px-3 py-1 rounded hover:bg-[#3A3A3A]"
+        >
+          Add Random Operator
+        </button>
+      </div>
+
+      <div className="mb-8">
+        <h3 className="text-white text-lg mb-2">With Few Operators</h3>
+        <MainComponent
+          operators={operators.slice(0, 3)}
+          onDragStart={handleDragStart}
+          title="Available Staff"
+        />
+      </div>
+
+      <div className="mb-8">
+        <h3 className="text-white text-lg mb-2">With Many Operators</h3>
+        <MainComponent
+          operators={[
+            ...operators,
+            ...operators.map((op) => `${op} (Shift 2)`),
+          ]}
+          onDragStart={handleDragStart}
+          maxHeight="24rem"
+        />
+      </div>
+
+      <div>
+        <h3 className="text-white text-lg mb-2">Custom Width</h3>
+        <MainComponent
+          operators={operators}
+          onDragStart={handleDragStart}
+          className="max-w-[300px]"
+        />
+      </div>
+    </div>
+  );
+}
+
+export default MainComponent;
