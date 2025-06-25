@@ -12,7 +12,7 @@ export class Machine extends Model {
     autoIncrement: true,
     primaryKey: true
   })
-  id!: number;
+  declare id: number;
 
   @Column({
     type: DataType.STRING(100),
