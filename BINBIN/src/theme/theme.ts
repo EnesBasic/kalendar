@@ -1,4 +1,4 @@
-interface ThemeColors {
+export interface ThemeColors {
   primary: string;
   secondary: string;
   background: string;
@@ -8,7 +8,7 @@ interface ThemeColors {
   success: string;
 }
 
-interface Theme {
+export interface Theme {
   colors: ThemeColors;
   spacing: {
     small: string;

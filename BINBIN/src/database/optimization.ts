@@ -1,4 +1,6 @@
-export const optimizeDatabase = async (sequelize) => {
+import { Sequelize } from 'sequelize';
+
+export const optimizeDatabase = async (sequelize: Sequelize) => {
   // 1. Create materialized views for frequent queries
   await sequelize.query(`
     CREATE MATERIALIZED VIEW IF NOT EXISTS weekly_schedule_summary AS
