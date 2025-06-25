@@ -3,6 +3,18 @@ import { Schedule } from './Schedule';
 import { Operator } from './Operator';
 import { Machine } from './Machine';
 
+export interface Shift {
+  // define shift properties
+  name: string;
+  // ...other properties
+}
+
+export interface ScheduleEntry {
+  // ...other properties
+  day: string;
+  shifts: Shift[];
+}
+
 @Table({
   tableName: 'schedule_entries',
   timestamps: true,
