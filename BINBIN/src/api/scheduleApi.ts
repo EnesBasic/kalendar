@@ -2,7 +2,7 @@ import axios from 'axios';
 import { sanitizeInput } from '../security/sanitize';
 
 const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: process.env.REACT_APP_API_URL, // Or NEXT_PUBLIC_API_URL for Next.js
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
