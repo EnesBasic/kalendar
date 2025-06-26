@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // import { ThemeProvider } from './components/ui/ThemeProvider';
 // If ThemeProvider does not exist, you can temporarily use React.Fragment as a placeholder:
 const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => <>{children}</>;
-import { ScheduleMain } from './components/schedule/ScheduleMain';
+import { ScheduleMain } from './BINBIN/src/components/schedule/ScheduleMain';
 import { Layout } from './components/ui/Layout';
 // import { ErrorBoundary } from './components/ui/ErrorBoundary';
 
