@@ -1,3 +1,5 @@
+import React, { useState, createContext, useContext } from "react";
+
 // src/theme/theme.ts
 export interface Theme {
   colors: {
@@ -37,30 +39,45 @@ export const darkTheme: Theme = {
   spacing: lightTheme.spacing
 };
 
+// ThemeContext and hook
+interface ThemeContextType {
+  theme: Theme;
+  toggleTheme: () => void;
+  isDark: boolean;
+}
+
+export const ThemeContext = createContext<ThemeContextType>({
+  theme: lightTheme,
+  toggleTheme: () => {},
+  isDark: false
+});
+
 // Enhanced ThemeProvider with switching
-export const ThemeProvider: React.FC = ({ children }) => {
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('light');
   
   const toggleTheme = () => {
     setCurrentTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
 
-  return (
-    <ThemeContext.Provider 
-      value={{
+  return React.createElement(
+    ThemeContext.Provider,
+    {
+      value: {
         theme: currentTheme === 'light' ? lightTheme : darkTheme,
         toggleTheme,
         isDark: currentTheme === 'dark'
-      }}
-    >
-      {children}
-    </ThemeContext.Provider>
+      }
+    },
+    children
   );
 };
 
-// Usage in components:
-const { theme, toggleTheme, isDark } = useTheme();
+// Custom hook for using theme context
+export const useTheme = () => useContext(ThemeContext);
 
-<Button onClick={toggleTheme}>
-  Switch to {isDark ? 'Light' : 'Dark'} Mode
-</Button>
+// Usage example (do not include in this file):
+// const { theme, toggleTheme, isDark } = useTheme();
+// <Button onClick={toggleTheme}>
+//   Switch to {isDark ? 'Light' : 'Dark'} Mode
+// </Button>
