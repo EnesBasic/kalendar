@@ -1,14 +1,16 @@
 // src/app.tsx
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider } from './components/ui/ThemeProvider';
+// import { ThemeProvider } from './components/ui/ThemeProvider';
+// If ThemeProvider does not exist, you can temporarily use React.Fragment as a placeholder:
+const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => <>{children}</>;
 import { ScheduleMain } from './components/schedule/ScheduleMain';
 import { Layout } from './components/ui/Layout';
-import { ErrorBoundary } from './components/ui/ErrorBoundary';
+// import { ErrorBoundary } from './components/ui/ErrorBoundary';
 
 const App = () => (
-  <ErrorBoundary>
+  <React.Fragment>
     <ThemeProvider>
       <Router>
         <Layout>
@@ -19,7 +21,14 @@ const App = () => (
         </Layout>
       </Router>
     </ThemeProvider>
-  </ErrorBoundary>
+  </React.Fragment>
 );
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const container = document.getElementById('root');
+if (container) {
+  const root = createRoot(container);
+  root.render(<App />);
+}
+
+// components/schedule/ScheduleMain.tsx
+// (This code should be in src/components/schedule/ScheduleMain.tsx, not here)
