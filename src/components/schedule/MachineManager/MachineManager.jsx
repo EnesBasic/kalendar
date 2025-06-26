@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import * as S from './MachineManager.styles';
 
-function MachineManager({
+const MachineManager = ({
   showMachineManager,
   machinesList,
   machineColors,
@@ -18,7 +18,7 @@ function MachineManager({
   onMachineColorChange,
   onToggleMachineManager,
   onShowHelpModal
-}) {
+}) => {
   const [showColorPicker, setShowColorPicker] = useState(false);
 
   return (
@@ -104,3 +104,13 @@ function MachineManager({
     </S.Wrapper>
   );
 }
+
+const OperatorManager = () => {
+  // Operator manager implementation
+}
+
+const ShiftManager = () => {
+  // Shift manager implementation
+}
+
+export default MachineManager;

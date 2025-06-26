@@ -22,10 +22,20 @@ function ScheduleTable({
   highlightedOperator,
   dragTarget,
   onDragEnter,
-  onDrop
+  onDrop,
+  loading,
+  viewMode
 }) {
   const weekDates = generateDatesForWeek(selectedWeek.dateRange);
   const filteredData = getFilteredData();
+
+  if (loading) {
+    return <div>Loading schedule...</div>;
+  }
+
+  if (!scheduleData || !Array.isArray(scheduleData)) {
+    return <div>No schedule data available.</div>;
+  }
 
   return (
     <S.TableWrapper>
