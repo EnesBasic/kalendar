@@ -1,7 +1,7 @@
 // ScheduleTable.tsx with sorting and filtering
 import React, { useMemo, useState } from 'react';
-import { ScheduleEntry } from '../../types/scheduleTypes';
-import { TextInput } from '../ui/TextInput';
+// import { ScheduleEntry } from '../../types/scheduleTypes';
+import TextInput from '../../ui/TextInput/TextInput';
 
 interface ScheduleTableProps {
   data: ScheduleEntry[];
@@ -77,3 +77,12 @@ export const ScheduleTable = ({ data, viewMode, loading }: ScheduleTableProps) =
     </div>
   );
 };
+
+// ScheduleEntry interface
+export interface ScheduleEntry {
+  id: string;
+  time: string;
+  machine: { name: string };
+  operator: { name: string };
+  shift: { name: string };
+}
