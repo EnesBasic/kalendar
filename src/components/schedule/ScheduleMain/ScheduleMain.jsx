@@ -10,7 +10,6 @@ import HelpModal from '../HelpModal/HelpModal.jsx';
 import { Button } from '../../ui/Button/Button';
 import ErrorMessage from '../../ui/ErrorMessage/ErrorMessage';
 import { useScheduleData } from '../../../hooks/useScheduleData';
-import { useScheduleData } from '../../../hooks/useScheduleData';
 
 // Example placeholder data
 const machines = ['Machine 1', 'Machine 2'];
