@@ -1,65 +1,26 @@
+// src/api/scheduleApi.ts
 import axios from 'axios';
-import { sanitizeInput } from '../security/sanitize';
+import { ScheduleEntry } from '../types/scheduleTypes';
 
-const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL, // Or NEXT_PUBLIC_API_URL for Next.js
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-    'X-Requested-With': 'XMLHttpRequest'
-  },
-  withCredentials: true
-});
+const API_BASE = process.env.REACT_APP_API_BASE || '/api';
 
-// Request interceptor for sanitization and auth
-apiClient.interceptors.request.use(config => {
-  if (config.data) {
-    config.data = sanitizeInput(config.data);
-  }
-  
-  if (config.params) {
-    config.params = sanitizeInput(config.params);
-  }
-
-  const token = localStorage.getItem('csrfToken');
-  if (token) {
-    config.headers['X-CSRF-Token'] = token;
-  }
-
-  return config;
-});
-
-// Response interceptor for error handling
-apiClient.interceptors.response.use(
-  response => response,
-  error => {
-    if (error.response?.status === 401) {
-      // Handle unauthorized
-    }
-    if (error.response?.status === 403) {
-      // Handle forbidden
-    }
-    return Promise.reject(error);
-  }
-);
-
-export const fetchSchedule = async (weekNumber: number, year: number) => {
+export const fetchSchedule = async (): Promise<ScheduleEntry[]> => {
   try {
-    const response = await apiClient.get(`/schedule`, {
-      params: {
-        week: weekNumber,
-        year: year
-      },
-      validateStatus: status => status < 500
-    });
-    
-    if (response.data.error) {
-      throw new Error(response.data.error);
-    }
-    
-    return response.data;
+    const response = await axios.get(`${API_BASE}/schedule`);
+    return response.data.map((item: any) => ({
+      ...item,
+      time: formatTime(item.startTime),
+    }));
   } catch (error) {
-    console.error('API Error:', error);
-    throw error;
+    throw new Error('Failed to fetch schedule data');
   }
+};
+
+export const updateScheduleEntry = async (entry: ScheduleEntry) => {
+  // Implementation...
+};
+
+// Helper function
+const formatTime = (isoString: string) => {
+  // Time formatting logic...
 };

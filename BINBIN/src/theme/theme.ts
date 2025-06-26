@@ -1,55 +1,66 @@
-export interface ThemeColors {
-  primary: string;
-  secondary: string;
-  background: string;
-  text: string;
-  error: string;
-  warning: string;
-  success: string;
-}
-
+// src/theme/theme.ts
 export interface Theme {
-  colors: ThemeColors;
-  spacing: {
-    small: string;
-    medium: string;
-    large: string;
+  colors: {
+    primary: string;
+    secondary: string;
+    background: string;
+    text: string;
   };
-  borderRadius: string;
+  spacing: {
+    sm: string;
+    md: string;
+    lg: string;
+  };
 }
 
 export const lightTheme: Theme = {
   colors: {
-    primary: '#4a9eff',
-    secondary: '#67e8f9',
+    primary: '#3498db',
+    secondary: '#2ecc71',
     background: '#ffffff',
-    text: '#1D1D1F',
-    error: '#ef4444',
-    warning: '#f59e0b',
-    success: '#10b981'
+    text: '#333333'
   },
   spacing: {
-    small: '4px',
-    medium: '8px',
-    large: '16px'
-  },
-  borderRadius: '4px'
+    sm: '4px',
+    md: '8px',
+    lg: '16px'
+  }
 };
 
 export const darkTheme: Theme = {
   colors: {
-    primary: '#67e8f9',
-    secondary: '#4a9eff',
-    background: '#1D1D1F',
-    text: '#ffffff',
-    error: '#dc2626',
-    warning: '#d97706',
-    success: '#059669'
+    primary: '#2980b9',
+    secondary: '#27ae60',
+    background: '#222222',
+    text: '#f5f5f5'
   },
-  spacing: {
-    small: '4px',
-    medium: '8px',
-    large: '16px'
-  },
-  borderRadius: '4px'
+  spacing: lightTheme.spacing
 };
+
+// Enhanced ThemeProvider with switching
+export const ThemeProvider: React.FC = ({ children }) => {
+  const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('light');
+  
+  const toggleTheme = () => {
+    setCurrentTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
+  return (
+    <ThemeContext.Provider 
+      value={{
+        theme: currentTheme === 'light' ? lightTheme : darkTheme,
+        toggleTheme,
+        isDark: currentTheme === 'dark'
+      }}
+    >
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+
+// Usage in components:
+const { theme, toggleTheme, isDark } = useTheme();
+
+<Button onClick={toggleTheme}>
+  Switch to {isDark ? 'Light' : 'Dark'} Mode
+</Button>

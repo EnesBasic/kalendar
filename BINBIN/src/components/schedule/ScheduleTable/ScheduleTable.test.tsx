@@ -1,46 +1,37 @@
+// ScheduleTable.test.tsx
 import React from 'react';
-import { render, screen } from '@testing-library/react';
-import ScheduleTable from './ScheduleTable';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { ScheduleTable } from './ScheduleTable';
+import { ScheduleEntry } from '../../types/scheduleTypes';
 
-const mockData = [
+const mockData: ScheduleEntry[] = [
   {
-    date: '01.01',
-    day: 'P',
-    shifts: [
-      {
-        time: '08.00-16.00',
-        operators: {
-          'M58-J-467': 'Operator 1',
-          'M53-E-929': 'Operator 2'
-        }
-      }
-    ]
-  }
+    id: '1',
+    time: '08:00',
+    machine: { id: 'm1', name: 'CNC-1', status: 'active' },
+    operator: { id: 'o1', name: 'John Doe', qualification: 'A' },
+    shift: { id: 's1', name: 'Morning', startTime: '06:00', endTime: '14:00' }
+  },
+  // Add more test entries...
 ];
 
 describe('ScheduleTable', () => {
-  it('renders without crashing', () => {
-    render(
-      <ScheduleTable
-        scheduleData={mockData}
-        machines={['M58-J-467', 'M53-E-929']}
-        shifts={['08.00-16.00']}
-        isEditing={false}
-      />
-    );
-    expect(screen.getByText('01.01')).toBeInTheDocument();
+  it('renders loading state', () => {
+    render(<ScheduleTable data={[]} viewMode="daily" loading={true} />);
+    expect(screen.getByText('Loading data...')).toBeInTheDocument();
   });
 
-  it('displays correct operator assignments', () => {
-    render(
-      <ScheduleTable
-        scheduleData={mockData}
-        machines={['M58-J-467', 'M53-E-929']}
-        shifts={['08.00-16.00']}
-        isEditing={false}
-      />
-    );
-    expect(screen.getByText('Operator 1')).toBeInTheDocument();
-    expect(screen.getByText('Operator 2')).toBeInTheDocument();
+  it('sorts by machine name', () => {
+    render(<ScheduleTable data={mockData} viewMode="daily" loading={false} />);
+    fireEvent.click(screen.getByText('Machine'));
+    expect(screen.getAllByRole('row')[1]).toHaveTextContent('CNC-1');
+  });
+
+  it('filters by search term', () => {
+    render(<ScheduleTable data={mockData} viewMode="daily" loading={false} />);
+    fireEvent.change(screen.getByPlaceholderText('Search machines or operators...'), {
+      target: { value: 'John' }
+    });
+    expect(screen.getByText('John Doe')).toBeInTheDocument();
   });
 });
