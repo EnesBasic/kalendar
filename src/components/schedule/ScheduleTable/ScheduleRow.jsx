@@ -30,7 +30,7 @@ function ScheduleRow({
         {isEditing ? (
           <ShiftSelect 
             shift={shift}
-            onChange={/* handler */}
+            onChange={() => {}}
           />
         ) : (
           formatShiftTime(shift)
@@ -40,8 +40,8 @@ function ScheduleRow({
       {machines.map(machine => (
         <S.OperatorCell
           key={`${dateInfo.date}-${shift}-${machine}`}
-          isHighlighted={/* condition */}
-          isDropTarget={/* condition */}
+          isHighlighted={false}
+          isDropTarget={false}
         >
           {/* Cell content */}
         </S.OperatorCell>

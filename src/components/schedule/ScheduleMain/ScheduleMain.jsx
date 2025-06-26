@@ -5,7 +5,7 @@ import ShiftManager from '../ShiftManager/ShiftManager.jsx';
 import ScheduleControls from '../ScheduleControls/ScheduleControls.jsx';
 import FilterPanel from '../FilterPanel/FilterPanel.jsx';
 import WeekSelector from '../WeekSelector/WeekSelector.jsx';
-import ScheduleTable from '../ScheduleTable';
+import ScheduleTable from '../ScheduleTable/ScheduleTable.jsx';
 import HelpModal from '../HelpModal/HelpModal.jsx';
 import { Button } from '../../ui/Button/Button';
 import ErrorMessage from '../../ui/ErrorMessage/ErrorMessage';

@@ -21,8 +21,7 @@ interface Shift {
 export interface ScheduleEntry {
   id: string;
   time: string;
-  machine: Machine;
-  operator: Operator;
-  shift: Shift;
-  notes?: string;
+  machine: { id: string; name: string; status?: string };
+  operator: { id: string; name: string; qualification?: string };
+  shift: { id: string; name: string; startTime?: string; endTime?: string };
 }

@@ -26,7 +26,7 @@ function ScheduleTable({
   loading,
   viewMode
 }) {
-  const weekDates = generateDatesForWeek(selectedWeek.dateRange);
+  const weekDates = generateDatesForWeek((selectedWeek && selectedWeek.dateRange) || []);
   const filteredData = getFilteredData();
 
   if (loading) {
@@ -68,6 +68,22 @@ function ScheduleTable({
           )}
         </S.TableBody>
       </S.Table>
+    {/* <table border="1" cellPadding="8">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Event</th>
+        </tr>
+      </thead>
+      <tbody>
+        {Array.isArray(data) && data.map((item, idx) => (
+          <tr key={idx}>
+            <td>{item.time}</td>
+            <td>{item.event}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table> */}
     </S.TableWrapper>
   );
 }
@@ -104,3 +120,24 @@ function FilteredView({ filteredData }) {
 }
 
 export default ScheduleTable;
+
+// Usage example (to be removed or commented out in the actual component file)
+// <ScheduleTable
+//   scheduleData={mockData}
+//   machines={[]}
+//   shifts={[]}
+//   operators={[]}
+//   operatorColors={{}}
+//   shiftColors={{}}
+//   isEditing={false}
+//   activeFilters={{}}
+//   dateFilter={null}
+//   loading={false}
+//   viewMode="daily"
+//   // Remove these if not supported:
+//   // onSort={vi.fn()}
+//   // sortBy=""
+//   // sortDirection="asc"
+//   // searchTerm=""
+//   // onSearchTermChange={vi.fn()}
+// />
