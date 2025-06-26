@@ -1,3 +1,12 @@
+import styled from 'styled-components';
+
+export const TableHeader = styled.th`...`;
+export const TableBody = styled.tbody`...`;
+export const DateCell = styled.td`...`;
+export const DayCell = styled.td`...`;
+export const ShiftCell = styled.td`...`;
+export const OperatorCell = styled.td`...`;
+
 export const generateWeeksForYear = (year) => {
   const weeks = [];
   const firstDayOfYear = new Date(year, 0, 1);
