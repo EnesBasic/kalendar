@@ -1,13 +1,10 @@
 import React from "react";
+import { ScheduleMain } from "./components/schedule/ScheduleMain/ScheduleMain";
+import './Button.css';
+import './ErrorMessage.css';
 
 function App() {
-  return (
-    <div>
-      <h1>Welcome to Kalendar!</h1>
-      <p>To get started, edit <code>src/App.tsx</code> and save to reload.</p>
-    
-    </div>
-  );
+  return <ScheduleMain />;
 }
 
 export default App;
