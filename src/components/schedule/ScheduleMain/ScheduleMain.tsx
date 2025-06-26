@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '../../ui/Button/Button';
 import ErrorMessage from '../../ui/ErrorMessage/ErrorMessage';
 
+
 interface ScheduleData {
   // Define the shape of your schedule data here
   [key: string]: any;
@@ -19,7 +20,10 @@ export function useScheduleData() {
       // Replace this with your actual data fetching logic
       // For now, we'll use a timeout to simulate async fetch
       await new Promise((resolve) => setTimeout(resolve, 500));
-      setData({ example: 'Schedule data loaded' });
+      setData([
+        { time: "09:00", event: "Meeting" },
+        { time: "11:00", event: "Coding" }
+      ]);
     } catch (err) {
       setError('Failed to load schedule data');
     } finally {
