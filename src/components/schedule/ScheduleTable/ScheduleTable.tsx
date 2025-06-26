@@ -9,7 +9,8 @@ interface ScheduleTableProps {
   loading: boolean;
 }
 
-export const ScheduleTable = ({ data, viewMode, loading }: ScheduleTableProps) => {
+const ScheduleTable = (props: ScheduleTableProps) => {
+  const { data, viewMode, loading } = props;
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
 
@@ -95,3 +96,5 @@ export interface ScheduleEntry {
   operator: { name: string };
   shift: { name: string };
 }
+
+export default ScheduleTable;

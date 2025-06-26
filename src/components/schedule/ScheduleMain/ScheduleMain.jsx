@@ -1,58 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import MachineManager from '../MachineManager/MachineManager.jsx';
 import OperatorManager from '../OperatorManager/OperatorManager.jsx';
 import ShiftManager from '../ShiftManager/ShiftManager.jsx';
 import ScheduleControls from '../ScheduleControls/ScheduleControls.jsx';
 import FilterPanel from '../FilterPanel/FilterPanel.jsx';
 import WeekSelector from '../WeekSelector/WeekSelector.jsx';
-import ScheduleTable from '../ScheduleTable/ScheduleTable.jsx';
+import ScheduleTable from '../ScheduleTable';
 import HelpModal from '../HelpModal/HelpModal.jsx';
 import { Button } from '../../ui/Button/Button';
 import ErrorMessage from '../../ui/ErrorMessage/ErrorMessage';
 import { useScheduleData } from '../../../hooks/useScheduleData';
-// Custom hook to fetch schedule data
-import { fetchScheduleData } from '../../../api/scheduleApi'; // Assume this is your API
-// Custom hook to manage schedule data fetching
 import { useScheduleData } from '../../../hooks/useScheduleData';
-// Assume this is your API for fetching schedule data
-// This is a placeholder for the actual API call
-// import { fetchScheduleData } from '../../../api/scheduleApi';
-// Custom hook to fetch schedule data
-// This is a placeholder for the actual API call
-// import { useScheduleData } from '../../../hooks/useScheduleData';
-// Custom hook to fetch schedule data
-// This is a placeholder for the actual API call
-// import { fetchScheduleData } from '../../../api/scheduleApi';
-// Custom hook to fetch schedule data
-// This is a placeholder for the actual API call
-// import { useScheduleData } from '../../../hooks/useScheduleData';
-// Custom hook to fetch schedule data
-// This is a placeholder for the actual API call
-// import { fetchScheduleData } from '../../../api/scheduleApi';
-// Custom hook to fetch schedule data
-// This is a placeholder for the actual API call
-// import { useScheduleData } from '../../../hooks/useScheduleData';
-// Custom hook to fetch schedule data
-// This is a placeholder for the actual API call
-// import { fetchScheduleData } from '../../../api/scheduleApi';
-// Custom hook to fetch schedule data
-// This is a placeholder for the actual API call
-// import { useScheduleData } from '../../../hooks/useScheduleData';
-// Custom hook to fetch schedule data
-// This is a placeholder for the actual API call
-// import { fetchScheduleData } from '../../../api/scheduleApi';
-// Custom hook to fetch schedule data
-// This is a placeholder for the actual API call
-// import { useScheduleData } from '../../../hooks/useScheduleData';
-// Custom hook to fetch schedule data
-// This is a placeholder for the actual API call
-// import { fetchScheduleData } from '../../../api/scheduleApi';
-// Custom hook to fetch schedule data
-// This is a placeholder for the actual API call
-// import { useScheduleData } from '../../../hooks/useScheduleData';
-// Custom hook to fetch schedule data
-// This is a placeholder for the actual API call
-
 
 // Example placeholder data
 const machines = ['Machine 1', 'Machine 2'];
