@@ -11,7 +11,7 @@ interface ScheduleTableProps {
 
 export const ScheduleTable = ({ data, viewMode, loading }: ScheduleTableProps) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortConfig, setSortConfig] = useState<{ key: keyof ScheduleEntry; direction: 'asc' | 'desc' } | null>(null);
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
 
   const filteredData = useMemo(() => {
     return data.filter(entry => 
@@ -20,21 +20,30 @@ export const ScheduleTable = ({ data, viewMode, loading }: ScheduleTableProps) =
     );
   }, [data, searchTerm]);
 
+  // Helper to get nested value by dot notation
+  const getValueByKey = (obj: any, key: string) => {
+    return key.split('.').reduce((acc, part) => acc && acc[part], obj);
+  };
+
   const sortedData = useMemo(() => {
     if (!sortConfig) return filteredData;
-    
+
     return [...filteredData].sort((a, b) => {
-      if (a[sortConfig.key] < b[sortConfig.key]) {
-        return sortConfig.direction === 'asc' ? -1 : 1;
+      const aValue = getValueByKey(a, sortConfig.key);
+      const bValue = getValueByKey(b, sortConfig.key);
+
+      if (aValue === bValue) return 0;
+      if (aValue == null) return 1;
+      if (bValue == null) return -1;
+      if (sortConfig.direction === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
       }
-      if (a[sortConfig.key] > b[sortConfig.key]) {
-        return sortConfig.direction === 'asc' ? 1 : -1;
-      }
-      return 0;
     });
   }, [filteredData, sortConfig]);
-
-  const requestSort = (key: keyof ScheduleEntry) => {
+  
+  const requestSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'asc';
     if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc';
