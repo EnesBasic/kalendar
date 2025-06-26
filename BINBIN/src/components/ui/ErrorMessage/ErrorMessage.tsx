@@ -1,17 +1,20 @@
 import React from 'react';
+import './ErrorMessage.css';
 
 interface ErrorMessageProps {
   message: string;
   onRetry?: () => void;
 }
 
-export const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, onRetry }) => (
-  <div style={{ color: 'red', margin: '1em 0' }}>
+const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, onRetry }) => (
+  <div className="error-message">
     <div>{message}</div>
     {onRetry && (
-      <button onClick={onRetry} style={{ marginTop: '0.5em' }}>
+      <button onClick={onRetry} className="error-message__retry-btn">
         Retry
       </button>
     )}
   </div>
 );
+
+export default ErrorMessage;

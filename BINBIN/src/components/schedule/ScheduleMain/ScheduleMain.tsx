@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../ui/Button/Button';
-import { ErrorMessage } from '../../../components/ui/ErrorMessage';
-
+import ErrorMessage from '../../../components/ui/ErrorMessage/ErrorMessage';
 
 interface ScheduleData {
   // Define the shape of your schedule data here
