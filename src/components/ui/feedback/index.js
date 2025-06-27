@@ -1,2 +1,2 @@
-// Auto-generated barrel file
 export { default as HelpModal } from './HelpModal';
+export { default as ErrorMessage } from '../ErrorMessage';
