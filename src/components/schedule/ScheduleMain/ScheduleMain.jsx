@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import { useState } from 'react';
 import MachineManager from '../MachineManager/MachineManager.jsx';
 import OperatorManager from '../OperatorManager/OperatorManager.jsx';
@@ -146,3 +148,7 @@ export const ScheduleMain = () => {
   );
 };
 export default App;
+// PropTypes validation
+ScheduleMain.propTypes = {
+  // Add prop validation here
+};

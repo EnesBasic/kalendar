@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import * as S from './ScheduleControls.styles';
 
@@ -86,3 +88,7 @@ function ScheduleControls({
     </S.ControlsContainer>
   );
 }
+// PropTypes validation
+ScheduleControls.propTypes = {
+  // Add prop validation here
+};

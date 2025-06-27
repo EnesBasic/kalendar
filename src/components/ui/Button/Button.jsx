@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import './Button.styles.js';
 
@@ -19,3 +21,7 @@ const Button = ({
 };
 
 export default Button;
+// PropTypes validation
+Button.propTypes = {
+  // Add prop validation here
+};

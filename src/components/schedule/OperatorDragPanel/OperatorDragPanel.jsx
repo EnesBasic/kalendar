@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import * as S from './OperatorDragPanel.styles';
 
@@ -31,3 +33,7 @@ function OperatorDragPanel({
     </S.Wrapper>
   );
 }
+// PropTypes validation
+OperatorDragPanel.propTypes = {
+  // Add prop validation here
+};

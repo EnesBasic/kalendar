@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import * as S from './ShiftManager.styles';
 
@@ -90,3 +92,7 @@ function ShiftManager({
     </S.Wrapper>
   );
 }
+// PropTypes validation
+ShiftManager.propTypes = {
+  // Add prop validation here
+};

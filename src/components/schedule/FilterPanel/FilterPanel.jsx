@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import * as S from './FilterPanel.styles';
 
@@ -56,3 +58,7 @@ function FilterPanel({
     </S.Wrapper>
   );
 }
+// PropTypes validation
+FilterPanel.propTypes = {
+  // Add prop validation here
+};

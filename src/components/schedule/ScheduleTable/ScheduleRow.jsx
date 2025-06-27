@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import * as S from './ScheduleTable.styles';
 
@@ -49,3 +51,7 @@ function ScheduleRow({
     </S.TableRow>
   );
 }
+// PropTypes validation
+ScheduleRow.propTypes = {
+  // Add prop validation here
+};

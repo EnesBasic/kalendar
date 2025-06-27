@@ -13,7 +13,7 @@ var __assign = (this && this.__assign) || function () {
 exports.__esModule = true;
 exports.EditingMode = exports.Default = void 0;
 var react_1 = require("react");
-var ScheduleTable_1 = require("./ScheduleTable");
+var ScheduleTable_1 = require("../components/schedule/ScheduleTable/ScheduleTable");
 exports["default"] = {
     title: 'Schedule/ScheduleTable',
     component: ScheduleTable_1["default"],

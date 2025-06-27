@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import './TextInput.styles.js';
 
@@ -22,3 +24,7 @@ const TextInput = ({
 };
 
 export default TextInput;
+// PropTypes validation
+TextInput.propTypes = {
+  // Add prop validation here
+};

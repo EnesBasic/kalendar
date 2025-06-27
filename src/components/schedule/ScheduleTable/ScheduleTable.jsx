@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import ScheduleRow from './ScheduleRow';
 import { generateDatesForWeek } from '../utils/dateUtils';
@@ -141,3 +143,7 @@ export default ScheduleTable;
 //   // searchTerm=""
 //   // onSearchTermChange={vi.fn()}
 // />
+// PropTypes validation
+ScheduleTable.propTypes = {
+  // Add prop validation here
+};

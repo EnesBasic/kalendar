@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import { formatDropdownText, formatHeaderDate } from '../../utils/dateUtils';
 import * as S from './WeekSelector.styles';
@@ -41,3 +43,7 @@ function WeekSelector({ allWeeks, selectedWeek, onWeekChange }) {
 }
 
 export default WeekSelector;
+// PropTypes validation
+WeekSelector.propTypes = {
+  // Add prop validation here
+};

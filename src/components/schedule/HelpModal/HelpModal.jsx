@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import * as S from './HelpModal.styles';
 
@@ -55,3 +57,7 @@ function HelpModal({
     </S.Modal>
   );
 }
+// PropTypes validation
+HelpModal.propTypes = {
+  // Add prop validation here
+};

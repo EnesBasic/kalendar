@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import { distinctColors } from '../constants/colors';
 import * as S from './ColorPicker.styles';
@@ -73,3 +75,7 @@ function ColorPicker({
     </S.Modal>
   );
 }
+// PropTypes validation
+ColorPicker.propTypes = {
+  // Add prop validation here
+};

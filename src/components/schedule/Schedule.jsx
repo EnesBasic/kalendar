@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import WeekSelector from '../WeekSelector';
 import ScheduleControls from '../ScheduleControls';
@@ -112,3 +114,7 @@ function Schedule({
 }
 
 export default Schedule;
+// PropTypes validation
+Schedule.propTypes = {
+  // Add prop validation here
+};

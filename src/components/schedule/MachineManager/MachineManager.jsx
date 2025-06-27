@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import React, { useState } from 'react';
 import * as S from './MachineManager.styles';
 
@@ -114,3 +116,7 @@ const ShiftManager = () => {
 }
 
 export default MachineManager;
+// PropTypes validation
+MachineManager.propTypes = {
+  // Add prop validation here
+};

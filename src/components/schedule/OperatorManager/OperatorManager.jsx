@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import * as S from './OperatorManager.styles';
 
@@ -39,3 +41,7 @@ function OperatorManager({
 }
 
 export default OperatorManager;
+// PropTypes validation
+OperatorManager.propTypes = {
+  // Add prop validation here
+};

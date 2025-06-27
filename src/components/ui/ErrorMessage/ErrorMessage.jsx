@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import './ErrorMessage.styles.js';
 
@@ -13,3 +15,7 @@ const ErrorMessage = ({ message, onRetry }) => {
 };
 
 export default ErrorMessage;
+// PropTypes validation
+ErrorMessage.propTypes = {
+  // Add prop validation here
+};
