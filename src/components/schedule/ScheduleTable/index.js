@@ -1,1 +1,1 @@
-export { default } from './ScheduleTable.jsx';
+export { default } from './ScheduleTable';
